@@ -3,15 +3,13 @@ package recycler
 import "testing"
 
 import (
-	"reflect"
 )
 
 func TestIntPtr(t *testing.T) {
 	var i *int
 	R := New()
-	t.Log(R.name(reflect.TypeOf(i)))
 	R.Add(
-		reflect.TypeOf(i),
+		"*int",
 		func() interface{} {
 			t.Log("new")
 			return new(int)
@@ -30,13 +28,13 @@ func TestIntPtr(t *testing.T) {
 		},
 		5,
 	)
-	i = R.Get(reflect.TypeOf(i), 2).(*int)
+	i = R.Get("*int", 2).(*int)
 	t.Log(*i)
 	if *i != 2 {
 		t.Error("i != 2, i == %v", *i)
 	}
-	R.Recycle(i)
-	i = R.Get(reflect.TypeOf(i)).(*int)
+	R.Recycle("*int", i)
+	i = R.Get("*int").(*int)
 	if *i != 0 {
 		t.Error("i != 0, i == %v", *i)
 	}

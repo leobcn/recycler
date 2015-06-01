@@ -24,7 +24,6 @@ package recycler
 
 import (
 	"fmt"
-	"reflect"
 )
 
 
@@ -49,12 +48,7 @@ func New() *Recycler {
 	}
 }
 
-func (r *Recycler) name(t reflect.Type) string {
-	return fmt.Sprintf("%s.%s-<%v>", t.PkgPath(), t.Name(), t)
-}
-
-func (r *Recycler) Add(t reflect.Type, c Creator, i Initializer, d Destructor, bufSize int) bool {
-	name := r.name(t)
+func (r *Recycler) Add(name string, c Creator, i Initializer, d Destructor, bufSize int) bool {
 	if _, has := r.types[name]; !has {
 		r.types[name] = make(chan interface{}, bufSize)
 		r.creators[name] = c
@@ -66,10 +60,9 @@ func (r *Recycler) Add(t reflect.Type, c Creator, i Initializer, d Destructor, b
 	return true
 }
 
-func (r *Recycler) Get(t reflect.Type, params ...interface{}) interface{} {
-	name := r.name(t)
+func (r *Recycler) Get(name string, params ...interface{}) interface{} {
 	if _, has := r.types[name]; !has {
-		panic(fmt.Errorf("Unknown type %v", t))
+		panic(fmt.Errorf("Unknown type %v", name))
 	}
 	var item interface{}
 	select {
@@ -81,11 +74,9 @@ func (r *Recycler) Get(t reflect.Type, params ...interface{}) interface{} {
 	return item
 }
 
-func (r *Recycler) Recycle(item interface{}) {
-	t := reflect.TypeOf(item)
-	name := r.name(t)
+func (r *Recycler) Recycle(name string, item interface{}) {
 	if _, has := r.types[name]; !has {
-		panic(fmt.Errorf("Unknown type %v", t))
+		panic(fmt.Errorf("Unknown type %v", name))
 	}
 	r.destructors[name](item)
 	select {
