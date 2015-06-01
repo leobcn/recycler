@@ -9,6 +9,7 @@ import (
 func TestIntPtr(t *testing.T) {
 	var i *int
 	R := New()
+	t.Log(R.name(reflect.TypeOf(i)))
 	R.Add(
 		reflect.TypeOf(i),
 		func() interface{} {

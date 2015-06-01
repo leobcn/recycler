@@ -50,7 +50,7 @@ func New() *Recycler {
 }
 
 func (r *Recycler) name(t reflect.Type) string {
-	return fmt.Sprintf("%s.%s", t.PkgPath(), t.Name())
+	return fmt.Sprintf("%s.%s-<%v>", t.PkgPath(), t.Name(), t)
 }
 
 func (r *Recycler) Add(t reflect.Type, c Creator, i Initializer, d Destructor, bufSize int) bool {
